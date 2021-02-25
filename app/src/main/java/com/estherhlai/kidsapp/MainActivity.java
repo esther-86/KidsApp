@@ -6,35 +6,23 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int DRAW_OVER_OTHER_APP_PERMISSION = 123;
-    private Button buttonAddWidget;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+         // setContentView(R.layout.activity_main);
 
-        askForSystemOverlayPermission();
-
-        buttonAddWidget = (Button) findViewById(R.id.button);
-        buttonAddWidget.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!Settings.canDrawOverlays(MainActivity.this)) {
-                    askForSystemOverlayPermission();
-                } else {
-                    Intent intent = new Intent(MainActivity.this, FloatingWidgetService.class);
-                    startService(intent);
-                    finish();
-                }
-            }
-        });
+        if (!Settings.canDrawOverlays(MainActivity.this)) {
+            askForSystemOverlayPermission();
+        } else {
+            Intent intent = new Intent(MainActivity.this, FloatingWidgetService.class);
+            startService(intent);
+            finish();
+        }
     }
 
     private void askForSystemOverlayPermission() {
