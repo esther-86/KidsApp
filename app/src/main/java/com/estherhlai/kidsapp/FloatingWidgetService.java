@@ -55,7 +55,7 @@ public class FloatingWidgetService extends Service {
                 PixelFormat.TRANSLUCENT);
 
         // initial position
-        layoutParams.gravity = Gravity.TOP | Gravity.RIGHT;
+        layoutParams.gravity = Gravity.TOP | Gravity.LEFT;
         layoutParams.x = 0;
         layoutParams.y = 100;
 
@@ -71,7 +71,7 @@ public class FloatingWidgetService extends Service {
         imageParams.x = 0;
         imageParams.y = 100;
 
-        windowManager = (WindowManager)getSystemService(WINDOW_SERVICE);
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         imageClose = new ImageView(this);
         imageClose.setImageResource(R.drawable.close_white);
         imageClose.setVisibility(View.INVISIBLE);
@@ -82,7 +82,7 @@ public class FloatingWidgetService extends Service {
         height = windowManager.getDefaultDisplay().getHeight();
         width = windowManager.getDefaultDisplay().getWidth();
 
-        textView = (TextView)mFloatingView.findViewById(R.id.text_widget);
+        textView = (TextView) mFloatingView.findViewById(R.id.text_widget);
 
         // show & update current time in textview
         Handler handler = new Handler();
@@ -106,8 +106,7 @@ public class FloatingWidgetService extends Service {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-                switch (event.getAction())
-                {
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         startClickTime = Calendar.getInstance().getTimeInMillis();
                         imageClose.setVisibility(View.VISIBLE);
@@ -120,8 +119,9 @@ public class FloatingWidgetService extends Service {
                     case MotionEvent.ACTION_UP:
                         long clickDuration = Calendar.getInstance().getTimeInMillis() - startClickTime;
                         imageClose.setVisibility(View.GONE);
-                        layoutParams.x = initialX+(int)(initialTouchX-event.getRawX());
-                        layoutParams.y = initialY+(int)(event.getRawY()-initialTouchY);
+                        // calculate x & y coordinates of view
+                        layoutParams.x = initialX;
+                        windowManager.updateViewLayout(mFloatingView, layoutParams);
                         if (clickDuration < MAX_CLICK_DURATION) {
                             Toast.makeText(
                                     FloatingWidgetService.this,
@@ -129,18 +129,18 @@ public class FloatingWidgetService extends Service {
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             // Remove widget
-                            if (layoutParams.y > height*0.6) {
+                            if (isWithinImageClose(layoutParams)) {
                                 stopSelf();
                             }
                         }
                         return true;
                     case MotionEvent.ACTION_MOVE:
                         // calculate x & y coordinates of view
-                        layoutParams.x = initialX+(int)(initialTouchX-event.getRawX());
+                        layoutParams.x = initialX+(int)(event.getRawX()-initialTouchX);
                         layoutParams.y = initialY+(int)(event.getRawY()-initialTouchY);
                         // update layout with new coordinates
                         windowManager.updateViewLayout(mFloatingView, layoutParams);
-                        if (layoutParams.y > height*0.6) {
+                        if (isWithinImageClose(layoutParams)) {
                             imageClose.setImageResource(R.drawable.close);
                         } else {
                             imageClose.setImageResource(R.drawable.close_white);
@@ -153,6 +153,10 @@ public class FloatingWidgetService extends Service {
         });
 
         return START_STICKY;
+    }
+
+    private boolean isWithinImageClose(WindowManager.LayoutParams layoutParams) {
+        return (layoutParams.y > height * 0.6);
     }
 
     @Override
