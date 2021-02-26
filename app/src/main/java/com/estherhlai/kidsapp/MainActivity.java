@@ -18,7 +18,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final int DRAW_OVER_OTHER_APP_PERMISSION = 123;
     private static final String TAG = "KidsAppMainActivity";
@@ -30,11 +30,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Set the dimensions of the sign-in button.
-        SignInButton signInButton = findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setOnClickListener(this);
-
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -42,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        signIn();
     }
 
     private void askForSystemOverlayPermission() {
@@ -52,17 +49,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, DRAW_OVER_OTHER_APP_PERMISSION);
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.sign_in_button:
-                signIn();
-                break;
-            default:
-                break;
         }
     }
 
@@ -99,11 +85,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void updateUI(GoogleSignInAccount account) {
         if (account == null) {
-            Toast.makeText(this, "Something was wrong with the sign-in process.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Something went wrong with the sign-in process.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Start the floating service
+        // Start the floating service upon successful login
         if (!Settings.canDrawOverlays(MainActivity.this)) {
             askForSystemOverlayPermission();
         } else {
