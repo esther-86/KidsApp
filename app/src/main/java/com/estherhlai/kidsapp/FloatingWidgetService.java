@@ -1,11 +1,14 @@
 package com.estherhlai.kidsapp;
 
+import android.accounts.Account;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,9 +19,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import static androidx.core.app.ActivityCompat.startActivityForResult;
 
 public class FloatingWidgetService extends Service {
 
